@@ -18,8 +18,8 @@
             data-target="#addModal">Add
             contact</button>
         <!-- add contact彈窗-->
-        <div class="modal fade" id="addModal" tabindex="-1" role="dialog"
-            aria-labelledby="addModalTitle" aria-hidden="true">
+        <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalTitle"
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -106,6 +106,20 @@
         </table>
     </div>
 
+    <template id="productrow">
+        <tr>
+            <td class="record"></td>
+            <td class="name"></td>
+            <td class="tel"></td>
+            <td class="email"></td>
+            <td>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
+                    onclick="editBtn(this)">Edit</button>
+                <button type="button" class="btn btn-primary btn-sm delete" onclick="deleteBtn(this)">Delete</button>
+            </td>
+        </tr>
+    </template>
+
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
@@ -120,20 +134,14 @@
 
     <script>
         var selectObj;
-        var inputElement = document.getElementsByTagName('input');
-        var name, tel, email;
+        var data = [{
+            id: 1,
+            name: 'Mark',
+            tel: 0979820541,
+            email: 'lucky@gmail.com'
+        }]
 
-        var data = [
-            {
-                id: '$ {count}',
-                name: 'Mark',
-                tel: 0979820541,
-                email: 'lucky@gmail.com'
-            }
-        ];
 
-        var count = 1
-        
         //清空新增鈕input內容
         function addBtn() {
             document.querySelector('#addInputName').value = ''
@@ -141,41 +149,55 @@
             document.querySelector('#addInputEmail').value = ''
         }
 
-        // 新增確定鈕
+        if ('content' in document.createElement('template')) {
+            var tb = document.querySelector("tbody");
+
+            // 使用現有 HTML tbody、行以及模板，來畫出表格
+            var t = document.querySelector('#productrow'),
+                td = t.content.querySelectorAll("td");
+                tr = t.content.querySelector("tr");
+
+            // 複製新的行並將其插至表格
+            for (var i = 0; i < data.length; i++) {
+                rowid = document.querySelector("tbody").querySelectorAll("tr").length + 1
+                tr.id = "productrow-" + rowid;
+                td[0].textContent = rowid;
+                td[1].textContent = data[i].name;
+                td[2].textContent = data[i].tel;
+                td[3].textContent = data[i].email;
+                tb.appendChild(document.importNode(t.content, true));
+            }
+
+        } else {
+            // 因為 HTML template 不被支援，所以要用其他方法在表格增加新行
+        }
+
         function submitBtn() {
-            // 取得input值
-            name = inputElement[0].value;
-            tel = inputElement[1].value;
-            email = inputElement[2].value;
-          
-            var contact = document.createElement('tr'); //取得元素
-            document.getElementById("contacts").appendChild(contact);
-            contact.innerHTML = `
-            <th>${count}</th>
-            <td class="name">${name}</td>
-            <td class="tel">${tel}</td>
-            <td class="email">${email}</td>
-            <td>
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                    data-target="#editModal" onclick="editBtn(this)">Edit</button>
-                <button type="button" class="btn btn-primary btn-sm delete" onclick="deleteBtn(this)">Delete</button>
-            </td>
-            `;
-            count++
-            // 關閉彈窗
+            //增加一行 
+            rowid = document.querySelector("tbody").querySelectorAll("tr").length + 1
+            tr.id = "productrow-" + rowid;
+            td[0].textContent = rowid;
+            td[1].textContent = document.querySelector('#addInputName').value;
+            td[2].textContent = document.querySelector('#addInputTel').value;
+            td[3].textContent = document.querySelector('#addInputEmail').value;
+            // 把值加進去
+            tb.appendChild(document.importNode(t.content, true));
             $('#addModal').modal('hide')
-            
-        };
+        }
 
         // 編輯按鈕
         function editBtn(el) {
             // console.log('el',$(el).parents('tr'))
             // $(el).parents('tr').css('background-color', 'red')
-             selectObj = $(el).parents('tr') // selectObj變數取得編輯按鈕的父元素tr
-             // 將新增的input資料傳入編輯input
-             document.querySelector('#EditInputName').value = inputElement[0].value
-             document.querySelector('#EditInputTel').value = inputElement[1].value
-             document.querySelector('#EditInputEmail').value = inputElement[2].value
+            selectObj = $(el).parents('tr') // selectObj變數取得編輯按鈕的父元素tr
+            // 將新增的input資料傳入編輯input
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].id === parseInt(event.target.parentNode.parentNode.id.split('-')[1])) {
+                    document.querySelector('#EditInputName').value = data[i].name;
+                    document.querySelector('#EditInputTel').value = data[i].tel;
+                    document.querySelector('#EditInputEmail').value = data[i].email;
+                }
+            }
         }
 
         // 編輯確定鈕
