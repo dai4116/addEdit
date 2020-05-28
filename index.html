@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <title>Address book</title>
+</head>
+
+<body>
+    <div class="container">
+        <h3 class="text-center mt-3 mb-3">Address book</h3>
+        <button type="button" class="btn btn-primary btn-sm mb-3" onclick="addBtn()" data-toggle="modal"
+            data-target="#addModal">Add
+            contact</button>
+        <!-- add contact彈窗-->
+        <div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+            aria-labelledby="addModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalTitle">Add contact</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="addInputName">Name</label>
+                                <input type="name" value="" class="form-control" id="addInputName"
+                                    aria-describedby="nameHelp" placeholder="Enter Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="addInputTel">Tel</label>
+                                <input type="tel" value="" class="form-control" id="addInputTel"
+                                    placeholder="Enter Tel">
+                            </div>
+                            <div class="form-group">
+                                <label for="addInputEmail">Email</label>
+                                <input type="email" value="" class="form-control" id="addInputEmail"
+                                    placeholder="Enter email">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" onclick="submitBtn()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Tel</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Edit</th>
+                </tr>
+            </thead>
+            <tbody id="contacts">
+                <!-- 編輯彈窗 -->
+                <div class="modal fade" id="editModal" tabindex="-1" role="dialog"
+                    aria-labelledby="editModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editModalCenterTitle">Add contact</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="EditInputName">Name</label>
+                                        <input type="name" value="" class="form-control" id="EditInputName"
+                                            aria-describedby="nameHelp" placeholder="Enter Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="EditInputTel">Tel</label>
+                                        <input type="tel" value="" class="form-control" id="EditInputTel"
+                                            placeholder="Enter Tel">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="EditInputEmail">Email</label>
+                                        <input type="email" value="" class="form-control" id="EditInputEmail"
+                                            placeholder="Enter email">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary" onclick="editSubmit()">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </tbody>
+        </table>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous">
+    </script>
+
+
+    <script>
+        var selectObj;
+        var inputElement = document.getElementsByTagName('input');
+        var name, tel, email;
+        var count = 1
+        
+        //清空新增鈕input內容
+        function addBtn() {
+            document.querySelector('#addInputName').value = ''
+            document.querySelector('#addInputTel').value = ''
+            document.querySelector('#addInputEmail').value = ''
+        }
+
+        // 新增確定鈕
+        function submitBtn() {
+            // 取得input值
+            name = inputElement[0].value;
+            tel = inputElement[1].value;
+            email = inputElement[2].value;
+          
+            var contact = document.createElement('tr'); //取得元素
+            document.getElementById("contacts").appendChild(contact);
+            contact.innerHTML = `
+            <th>${count}</th>
+            <td class="name">${name}</td>
+            <td class="tel">${tel}</td>
+            <td class="email">${email}</td>
+            <td>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                    data-target="#editModal" onclick="editBtn(this)">Edit</button>
+                <button type="button" class="btn btn-primary btn-sm delete" onclick="deleteBtn(this)">Delete</button>
+            </td>
+            `;
+            count++
+            // 關閉彈窗
+            $('#addModal').modal('hide')
+            
+        };
+
+        // 編輯按鈕
+        function editBtn(el) {
+            // console.log('el',$(el).parents('tr'))
+            // $(el).parents('tr').css('background-color', 'red')
+             selectObj = $(el).parents('tr') // selectObj變數取得編輯按鈕的父元素tr
+             // 將新增的input資料傳入編輯input
+             document.querySelector('#EditInputName').value = inputElement[0].value
+             document.querySelector('#EditInputTel').value = inputElement[1].value
+             document.querySelector('#EditInputEmail').value = inputElement[2].value
+        }
+
+        // 編輯確定鈕
+        function editSubmit() {
+            // 找到tr裡的class，將編輯value值傳入表格中
+            selectObj.find('.name').text(document.querySelector('#EditInputName').value)
+            selectObj.find('.tel').text(document.querySelector('#EditInputTel').value)
+            selectObj.find('.email').text(document.querySelector('#EditInputEmail').value)
+
+            $('#editModal').modal('hide')
+        }
+
+        // 刪除整列
+        function deleteBtn(_this) {
+            $(_this).parents('tr').remove();
+        }
+    </script>
+
+    <!-- 網站參考 -->
+    <!-- 傳入元素 https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_document_createelement4 -->
+    <!-- 取得input值 https://pjchender.blogspot.com/2015/11/javascript.html -->
+</body>
+
+</html>
