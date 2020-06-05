@@ -124,6 +124,11 @@
         
         //清空新增鈕input內容
         function addBtn() {
+            $.ajax({
+                url: "api/list.php",
+                type: 'GET',
+                data: {},
+            })
             document.querySelector('#addInputName').value = ''
             document.querySelector('#addInputTel').value = ''
             document.querySelector('#addInputEmail').value = ''
