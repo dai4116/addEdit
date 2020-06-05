@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
+       
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+            integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+            integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous">
+        </script>
     <title>Address book</title>
 </head>
 
@@ -107,21 +115,11 @@
     </div>
 
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
-    </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
-        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous">
-    </script>
-
 
     <script>
         var selectObj;
         var inputElement = document.getElementsByTagName('input');
-        var name, tel, email;
+        var id, name, tel, email;
         var count = 1
         
         //清空新增鈕input內容
@@ -133,6 +131,19 @@
 
         // 新增確定鈕
         function submitBtn() {
+            var data = {
+                name: inputElement[0].value,
+                tel: inputElement[1].value,
+                email: inputElement[2].value,
+            }
+            $.ajax({
+                url: "api/add.php",
+                type: 'POST',
+                data: data,
+                success: function(result){
+                    alert("ok")
+                }
+            })
             // 取得input值
             name = inputElement[0].value;
             tel = inputElement[1].value;
@@ -141,7 +152,7 @@
             var contact = document.createElement('tr'); //取得元素
             document.getElementById("contacts").appendChild(contact);
             contact.innerHTML = `
-            <th>${count}</th>
+            <th class="id">${count}</th>
             <td class="name">${name}</td>
             <td class="tel">${tel}</td>
             <td class="email">${email}</td>
@@ -162,24 +173,54 @@
             // console.log('el',$(el).parents('tr'))
             // $(el).parents('tr').css('background-color', 'red')
              selectObj = $(el).parents('tr') // selectObj變數取得編輯按鈕的父元素tr
-             // 將新增的input資料傳入編輯input
-             document.querySelector('#EditInputName').value = inputElement[0].value
-             document.querySelector('#EditInputTel').value = inputElement[1].value
-             document.querySelector('#EditInputEmail').value = inputElement[2].value
+             // 保留新增輸入的值
+             document.querySelector('#EditInputName').value = selectObj.find('.name').text()
+             document.querySelector('#EditInputTel').value = selectObj.find('.tel').text()
+             document.querySelector('#EditInputEmail').value = selectObj.find('.email').text()
         }
 
         // 編輯確定鈕
         function editSubmit() {
-            // 找到tr裡的class，將編輯value值傳入表格中
+             // 找到tr裡的class，將編輯value值傳入表格中
             selectObj.find('.name').text(document.querySelector('#EditInputName').value)
             selectObj.find('.tel').text(document.querySelector('#EditInputTel').value)
             selectObj.find('.email').text(document.querySelector('#EditInputEmail').value)
 
+            var data = {
+                id: selectObj.find('.id').text(),
+                name: selectObj.find('.name').text(),
+                tel: selectObj.find('.tel').text(),
+                email: selectObj.find('.email').text()
+            }
+            $.ajax({
+                url: "api/update.php",
+                type: 'POST',
+                data: data,
+                success: function(result){
+                    var a = JSON.parse(result)
+                    //console.log('>>',a.code)
+                    alert("ok")
+                },
+            })
             $('#editModal').modal('hide')
         }
 
         // 刪除整列
         function deleteBtn(_this) {
+            console.log($(_this).parents('tr').find('.id').text())
+            var data = {
+                id: $(_this).parents('tr').find('.id').text()
+            }
+            $.ajax({
+                url: "api/del.php",
+                type: 'POST',
+                data: data,
+                success: function(result){
+                    var a = JSON.parse(result)
+                    console.log(data)
+                    alert("ok")
+                }
+            })
             $(_this).parents('tr').remove();
         }
     </script>
