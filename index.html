@@ -8,26 +8,34 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
-       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-            integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
-        </script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
-            integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous">
-        </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous">
+    </script>
     <title>Address book</title>
 </head>
 
 <body>
     <div class="container">
         <h3 class="text-center mt-3 mb-3">Address book</h3>
-        <button type="button" class="btn btn-primary btn-sm mb-3" onclick="addBtn()" data-toggle="modal"
-            data-target="#addModal">Add
-            contact</button>
+        <div class="mb-3">
+            <button type="button" class="btn btn-primary btn-sm" onclick="addBtn()" data-toggle="modal"
+                data-target="#addModal">Add
+                contact</button>
+            <h6 class="d-inline-block ml-3">篩選地區</h6>
+            <select class="form-control filterSelect d-inline-block" style="width:200px">
+                <option>Kaohsiung</option>
+                <option>Taichung</option>
+                <option>Taipei</option>
+            </select>
+        </div>
         <!-- add contact彈窗-->
-        <div class="modal fade" id="addModal" tabindex="-1" role="dialog"
-            aria-labelledby="addModalTitle" aria-hidden="true">
+        <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalTitle"
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -50,8 +58,13 @@
                             </div>
                             <div class="form-group">
                                 <label for="addInputEmail">Email</label>
-                                <input type="email" value="" class="form-control" id="addInputEmail"
-                                    placeholder="Enter email">
+                                <!-- <input type="email" value="" class="form-control" id="addInputEmail"
+                                    placeholder="Enter email"> -->
+                                <select class="form-control addSelect">
+                                    <option class="a">Kaohsiung</option>
+                                    <option class="b">Taichung</option>
+                                    <option class="c">Taipei</option>
+                                </select>
                             </div>
                         </form>
                     </div>
@@ -98,8 +111,13 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="EditInputEmail">Email</label>
-                                        <input type="email" value="" class="form-control" id="EditInputEmail"
-                                            placeholder="Enter email">
+                                        <!-- <input type="email" value="" class="form-control" id="EditInputEmail"
+                                            placeholder="Enter email"> -->
+                                        <select class="form-control editSelect">
+                                            <option>Kaohsiung</option>
+                                            <option>Taichung</option>
+                                            <option>Taipei</option>
+                                        </select>
                                     </div>
                                 </form>
                             </div>
@@ -121,39 +139,62 @@
         var inputElement = document.getElementsByTagName('input');
         var id, name, tel, email;
         var count = 1
-        
-        //清空新增鈕input內容
-        function addBtn() {
+        //一進來就先取得list
+        $(function () {
             $.ajax({
                 url: "api/list.php",
-                type: 'GET',
+                type: "GET",
                 data: {},
-            })
+                success: result => {
+                    // console.log(result);
+                    var items = JSON.parse(result);
+                    // console.log(">>>", items.data)
+                    items.data.forEach(function (el, i) {
+                        // console.log("name", items.data[i][1])
+                        name = items.data[i][1];
+                        tel = items.data[i][2];
+                        email = items.data[i][3];
+                        var contact = document.createElement(
+                            'tr'); //取得元素
+                        document.getElementById("contacts").appendChild(
+                            contact);
+                        contact.innerHTML = `
+                            <th class="id">${count}</th>
+                            <td class="name">${name}</td>
+                            <td class="tel">${tel}</td>
+                            <td class="email">${email}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                    data-target="#editModal" onclick="editBtn(this)">Edit</button>
+                                <button type="button" class="btn btn-primary btn-sm delete" onclick="deleteBtn(this)">Delete</button>
+                            </td>
+                            `;
+                        count++
+                    })
+                }
+            });
+        });
+
+        //清空新增鈕input內容
+        function addBtn() {
             document.querySelector('#addInputName').value = ''
             document.querySelector('#addInputTel').value = ''
-            document.querySelector('#addInputEmail').value = ''
         }
 
         // 新增確定鈕
         function submitBtn() {
-            var data = {
-                name: inputElement[0].value,
-                tel: inputElement[1].value,
-                email: inputElement[2].value,
-            }
             $.ajax({
                 url: "api/add.php",
                 type: 'POST',
-                data: data,
-                success: function(result){
+                data: {},
+                success: function (result) {
                     alert("ok")
                 }
             })
             // 取得input值
             name = inputElement[0].value;
             tel = inputElement[1].value;
-            email = inputElement[2].value;
-          
+            email = $(".addSelect option:selected").text();
             var contact = document.createElement('tr'); //取得元素
             document.getElementById("contacts").appendChild(contact);
             contact.innerHTML = `
@@ -170,26 +211,30 @@
             count++
             // 關閉彈窗
             $('#addModal').modal('hide')
-            
+            // for () {
+            //     let text = $(doc).find('.tel').text()
+            //     if (text !== select) {
+            //         $(doc).hide()
+            //     }
+            // }
         };
 
         // 編輯按鈕
         function editBtn(el) {
             // console.log('el',$(el).parents('tr'))
             // $(el).parents('tr').css('background-color', 'red')
-             selectObj = $(el).parents('tr') // selectObj變數取得編輯按鈕的父元素tr
-             // 保留新增輸入的值
-             document.querySelector('#EditInputName').value = selectObj.find('.name').text()
-             document.querySelector('#EditInputTel').value = selectObj.find('.tel').text()
-             document.querySelector('#EditInputEmail').value = selectObj.find('.email').text()
+            selectObj = $(el).parents('tr') // selectObj變數取得編輯按鈕的父元素tr
+            // 保留新增輸入的值
+            document.querySelector('#EditInputName').value = selectObj.find('.name').text()
+            document.querySelector('#EditInputTel').value = selectObj.find('.tel').text()
         }
 
         // 編輯確定鈕
         function editSubmit() {
-             // 找到tr裡的class，將編輯value值傳入表格中
+            // 找到tr裡的class，將編輯value值傳入表格中
             selectObj.find('.name').text(document.querySelector('#EditInputName').value)
             selectObj.find('.tel').text(document.querySelector('#EditInputTel').value)
-            selectObj.find('.email').text(document.querySelector('#EditInputEmail').value)
+            selectObj.find('.email').text($(".editSelect option:selected").text())
 
             var data = {
                 id: selectObj.find('.id').text(),
@@ -201,9 +246,8 @@
                 url: "api/update.php",
                 type: 'POST',
                 data: data,
-                success: function(result){
-                    var a = JSON.parse(result)
-                    //console.log('>>',a.code)
+                success: result => {
+                    var items = JSON.parse(result)
                     alert("ok")
                 },
             })
@@ -220,15 +264,31 @@
                 url: "api/del.php",
                 type: 'POST',
                 data: data,
-                success: function(result){
-                    var a = JSON.parse(result)
+                success: function (result) {
+                    var items = JSON.parse(result)
                     console.log(data)
                     alert("ok")
                 }
             })
             $(_this).parents('tr').remove();
         }
+
+        //篩選地區
+        $(".filterSelect").change(function () {
+            let selectText = $(".filterSelect option:selected").text()
+            console.log($(this))
+            $(document).find('.email').each(function(el){
+                var text = $(this).text()
+                console.log(">>>",text)
+                console.log($(this).parents('tr'))                
+            })
+            if (selectText !== val) {
+
+            }
+        })
     </script>
+
+
 
     <!-- 網站參考 -->
     <!-- 傳入元素 https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_document_createelement4 -->
