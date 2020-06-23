@@ -28,9 +28,11 @@
                 contact</button>
             <h6 class="d-inline-block ml-3">篩選地區</h6>
             <select class="form-control filterSelect d-inline-block" style="width:200px">
-                <option>Kaohsiung</option>
-                <option>Taichung</option>
-                <option>Taipei</option>
+                <option disabled selected hidden>請選擇</option>
+                <option value="all">all</option>
+                <option value="Kaohsiung">Kaohsiung</option>
+                <option value="Taichung">Taichung</option>
+                <option value="Taipei">Taipei</option>
             </select>
         </div>
         <!-- add contact彈窗-->
@@ -61,9 +63,10 @@
                                 <!-- <input type="email" value="" class="form-control" id="addInputEmail"
                                     placeholder="Enter email"> -->
                                 <select class="form-control addSelect">
-                                    <option class="a">Kaohsiung</option>
-                                    <option class="b">Taichung</option>
-                                    <option class="c">Taipei</option>
+                                    <option disabled selected hidden>請選擇</option>
+                                    <option value="Kaohsiung">Kaohsiung</option>
+                                    <option value="Taichung">Taichung</option>
+                                    <option value="Taipei">Taipei</option>
                                 </select>
                             </div>
                         </form>
@@ -114,9 +117,10 @@
                                         <!-- <input type="email" value="" class="form-control" id="EditInputEmail"
                                             placeholder="Enter email"> -->
                                         <select class="form-control editSelect">
-                                            <option>Kaohsiung</option>
-                                            <option>Taichung</option>
-                                            <option>Taipei</option>
+                                            <option disabled selected hidden>請選擇</option>
+                                            <option value="Kaohsiung">Kaohsiung</option>
+                                            <option value="Taichung">Taichung</option>
+                                            <option value="Taipei">Taipei</option>
                                         </select>
                                     </div>
                                 </form>
@@ -183,12 +187,18 @@
 
         // 新增確定鈕
         function submitBtn() {
+            var data = {
+                name: inputElement[0].value,
+                tel: inputElement[1].value,
+                email: $(".addSelect option:selected").text(),
+            }
             $.ajax({
                 url: "api/add.php",
                 type: 'POST',
-                data: {},
+                data: data,
                 success: function (result) {
-                    alert("ok")
+                    var items = JSON.parse(result)
+                    alert("新增成功")
                 }
             })
             // 取得input值
@@ -227,6 +237,8 @@
             // 保留新增輸入的值
             document.querySelector('#EditInputName').value = selectObj.find('.name').text()
             document.querySelector('#EditInputTel').value = selectObj.find('.tel').text()
+            // $(".editSelect option:selected").text(selectObj.find('.email').text())
+            $(".editSelect").val(selectObj.find('.email').text())
         }
 
         // 編輯確定鈕
@@ -234,8 +246,7 @@
             // 找到tr裡的class，將編輯value值傳入表格中
             selectObj.find('.name').text(document.querySelector('#EditInputName').value)
             selectObj.find('.tel').text(document.querySelector('#EditInputTel').value)
-            selectObj.find('.email').text($(".editSelect option:selected").text())
-
+            selectObj.find('.email').text($(".editSelect").val())
             var data = {
                 id: selectObj.find('.id').text(),
                 name: selectObj.find('.name').text(),
@@ -246,10 +257,10 @@
                 url: "api/update.php",
                 type: 'POST',
                 data: data,
-                success: result => {
+                success: function (result) {
                     var items = JSON.parse(result)
-                    alert("ok")
-                },
+                    alert("新增成功")
+                }
             })
             $('#editModal').modal('hide')
         }
@@ -275,16 +286,17 @@
 
         //篩選地區
         $(".filterSelect").change(function () {
-            let selectText = $(".filterSelect option:selected").text()
+            let selectText = $(".filterSelect").val()
             console.log($(this))
-            $(document).find('.email').each(function(el){
+            $(document).find('.email').each(function (el) {
                 var text = $(this).text()
-                console.log(">>>",text)
-                console.log($(this).parents('tr'))                
+                // console.log($(this).parents('tr'))
+                if (selectText !== text && selectText != 'all') {
+                    $(this).parents('tr').hide()
+                } else {
+                    $(this).parents('tr').show()
+                }
             })
-            if (selectText !== val) {
-
-            }
         })
     </script>
 
